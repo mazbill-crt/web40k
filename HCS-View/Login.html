@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One_Varse</title>
+
+  <!-- Preload & Preconnect agar video/logo tampil instant -->
+  <link rel="preconnect" href="https://files.catbox.moe" crossorigin>
+  <link rel="dns-prefetch" href="https://files.catbox.moe">
+  <link rel="preload" as="image" href="https://files.catbox.moe/jw6itl.jpg">
+  <link rel="preload" as="video" href="https://files.catbox.moe/7kllma.mp4">
+
+  <style>
+    :root {
+      --primary: #ff3333;
+      --secondary: #ff3333;
+      --text: #ffffff;
+      --muted: #bbbbbb;
+      --input-bg: rgba(40, 40, 70, 0.7);
+      --card-bg: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ðŸŽ¬ Video langsung tampil dengan poster */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      background: black;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(2px);
+      text-align: center;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.97);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-shadow: 0 2px 8px rgba(255, 51, 51, 0.8);
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 100%;
+      height: 120px;
+      border-radius: 12px;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 25px auto;
+      box-shadow: 0 0 15px rgba(255, 51, 51, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      opacity: 0.95;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .logo:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 25px rgba(255, 51, 51, 0.8);
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+      animation: fadeIn 1s ease forwards;
+      animation-delay: 0.3s;
+    }
+
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--secondary);
+      font-size: 1.2rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--input-bg);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      box-shadow: 0 0 5px 2px rgba(255, 51, 51, 0.7);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--primary);
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px 2px rgba(255, 51, 51, 0.7);
+    }
+
+    button:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 0 25px rgba(255, 51, 51, 0.9);
+    }
+
+    button i {
+      margin-right: 8px;
+    }
+
+    #btnPlanBuy {
+      margin-bottom: 25px;
+      font-weight: 700;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+      animation: fadeIn 1.2s ease forwards;
+    }
+
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .popup.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .popup-content {
+      background: rgba(30, 30, 56, 0.9);
+      border-radius: 16px;
+      padding: 24px;
+      width: min(90vw, 400px);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      position: relative;
+      backdrop-filter: blur(10px);
+      color: white;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .feature-card {
+      background-color: rgba(40, 40, 70, 0.8);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: scale(1.05);
+    }
+
+    #toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(50, 50, 89, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      z-index: 1001;
+    }
+  </style>
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+  <video autoplay loop muted preload="auto" id="bg-video" poster="https://files.catbox.moe/jw6itl.jpg">
+    <source src="background.mp4" type="video/mp4">
+  </video>
+
+  <div class="container">
+    <div class="card">
+      <img class="logo" src="profile.jpg" alt="Vorlex Logo" loading="eager">
+
+      <button id="btnPlanBuy">
+        <i class="fas fa-crown"></i> PLAN BUY
+      </button>
+
+      <form method="POST" action="/auth">
+        <div class="form-group">
+          <i class="fas fa-user"></i>
+          <input type="text" name="username" placeholder="Username" required />
+        </div>
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="key" placeholder="Password" required />
+        </div>
+        <button type="submit">
+          <i class="fas fa-arrow-right"></i> M A S U K
+        </button>
+      </form>
+
+      <div class="footer">© 2025 One-Varse</div>
+    </div>
+  </div>
+
+  <div class="popup" id="popupPlan">
+    <div class="popup-content">
+      <h3 style="color: var(--primary); margin-bottom: 10px;">Account Access</h3>
+      <div class="feature-grid">
+        <div class="feature-card"><h5>User 1 month</h5><p>Rp 10.000</p></div>
+        <div class="feature-card"><h5>User permanen</h5><p>Rp 15.000</p></div>
+        <div class="feature-card"><h5>User reseller</h5><p>Rp 25.000</p></div>
+        <div class="feature-card"><h5>User owner</h5><p>Rp 35.000</p></div>
+        <div class="feature-card"><h5>User project</h5><p>Rp 45.000</p></div>
+        <a href="https://t.me/Bejorbug" target="_blank" class="dev-btn telegram">takan untuk beli</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" style="display:none;"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const msg = params.get("msg");
+    if (msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.style.display = "block";
+    }
+
+    document.getElementById('btnPlanBuy').addEventListener('click', () => {
+      document.getElementById('popupPlan').classList.add('active');
+    });
+
+    document.getElementById('popupPlan').addEventListener('click', (event) => {
+      if (event.target === event.currentTarget) {
+        event.currentTarget.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
